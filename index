@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Vial Nacional - Registro Oficial</title>
+    <style>
+        :root { --accent-blue: #2563eb; --accent-green: #10b981; --bg-dark: #0f172a; --card-dark: #1e293b; --text-muted: #94a3b8; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-dark); color: white; margin: 0; padding: 20px; }
+        .card { background: var(--card-dark); padding: 25px; border-radius: 20px; max-width: 550px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .info-box { background: rgba(255,255,255,0.03); border: 1px solid var(--accent-blue); padding: 20px; border-radius: 16px; margin: 20px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn-principal { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-principal:hover { background: #1d4ed8; }
+        .whatsapp-alert { background: rgba(37, 99, 235, 0.15); border: 1px solid var(--accent-blue); padding: 20px; border-radius: 14px; margin-top: 20px; text-align: center; }
+        .footer-legal { text-align: center; margin-top: 30px; font-size: 10px; color: var(--text-muted); line-height: 1.4; }
+        .loader { display: none; text-align: center; padding: 40px; }
+        .progress-bar { height: 8px; background: #334155; border-radius: 4px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent-green); transition: 0.5s; }
+    </style>
+</head>
+<body>
+
+<!-- PANTALLA 1: INICIO -->
+<div id="screen-1" class="card">
+    <h2 style="text-align:center;">Registro Nacional de Trámites Viales</h2>
+    <div class="info-box">
+        <h3 style="color: var(--accent-blue); margin-top: 0;">Soluciones de movilidad</h3>
+        <p style="font-size: 14px; line-height: 1.6;">Gestionamos tu primera licencia, renovación o recuperación de cédula vehicular de forma inmediata. Solución profesional para circular sin demoras.</p>
+        <p style="font-size: 12px; color: var(--text-muted); font-style: italic;">* Gestión privada. Utilícese con responsabilidad.</p>
+    </div>
+
+    <form id="regForm" onsubmit="event.preventDefault(); showLoader();">
+        <div class="form-group">
+            <label>Seleccione el Trámite (Inversión)</label>
+            <select id="tipo-tramite-select" onchange="updateForm()">
+                <option value="licencia">Licencia de Conducir - $75.000</option>
+                <option value="cedula">Cédula Digital - $75.000</option>
+                <option value="ambas">Ambas Documentaciones - $150.000</option>
+            </select>
+        </div>
+
+        <div id="campo-direccion" style="display:none;">
+            <div class="form-group">
+                <label>Dirección de Envío (Vía Cargo)</label>
+                <input type="text" id="input-dir" placeholder="Calle, Número, Localidad, Provincia">
+            </div>
+        </div>
+
+        <div id="info-envio" style="display:none; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+            <strong style="color: #fbbf24;">📦 Envío Via Cargo:</strong>
+            <p style="font-size: 11px; color: #fbbf24; margin-top: 5px;">Demora 4-5 días hábiles tras validar pago. El carnet es 100% idéntico al original.</p>
+        </div>
+
+        <div class="form-group">
+            <label>CUIL (Sin guiones)</label>
+            <input type="text" id="input-cuil" placeholder="Ej: 20423334441" required>
+        </div>
+        
+        <button type="submit" class="btn-principal">Comenzar trámite</button>
+    </form>
+</div>
+
+<!-- PANTALLA 2: LOADER TÉCNICO -->
+<div id="screen-2" class="card loader">
+    <h3>Procesando Legajo...</h3>
+    <div class="progress-bar"><div id="bar-1" class="progress-fill"></div></div>
+    <p id="st-1" style="font-size: 12px;">Conectando con API RENAPER...</p>
+</div>
+
+<!-- PANTALLA 3: RESUMEN -->
+<div id="screen-3" class="card" style="display:none;">
+    <h2 style="text-align:center;">Solicitud Procesada</h2>
+    <div style="text-align:center; color: var(--accent-green); font-size: 12px; font-weight: bold; margin-bottom: 15px;">ESTADO: PENDIENTE DE VALIDACIÓN FINAL</div>
+    
+    <div class="whatsapp-alert">
+        <strong>⚠️ Instrucciones para la habilitación:</strong><br><br>
+        1. Transfiera el total al Alias: <code style="background:#000; padding:2px 5px; color:#fff;">RJIMENEZ33.COCOS</code><br>
+        2. Reporte el comprobante al WhatsApp oficial:
+        <br><br>
+        <a href="https://wa.me/5491125922448" class="btn-principal" style="background:#25d366;">💬 Consultar y Enviar Pago</a>
+    </div>
+
+    <div class="footer-legal">
+        <p>© 2026 Registro Nacional de Trámites Viales</p>
+        <p>Procesamiento automatizado por protocolos cifrados.</p>
+    </div>
+</div>
+
+<script>
+    function updateForm() {
+        const val = document.getElementById('tipo-tramite-select').value;
+        const dir = document.getElementById('campo-direccion');
+        const info = document.getElementById('info-envio');
+        const show = (val === 'ambas' || val === 'licencia');
+        dir.style.display = show ? 'block' : 'none';
+        info.style.display = show ? 'block' : 'none';
+    }
+
+    function showLoader() {
+        document.getElementById('screen-1').style.display = 'none';
+        document.getElementById('screen-2').style.display = 'block';
+        
+        setTimeout(() => { 
+            document.getElementById('bar-1').style.width = '100%';
+            document.getElementById('st-1').innerText = '✅ API Mi Argentina: Sincronizado';
+            setTimeout(() => {
+                document.getElementById('screen-2').style.display = 'none';
+                document.getElementById('screen-3').style.display = 'block';
+            }, 1000);
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>
